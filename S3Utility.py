@@ -203,24 +203,6 @@ class S3Utility:
             logging.error(e)
             return object_list
 
-    def delete_directory_from_s3(self, s3_path: str) -> bool:
-        """
-        Delete all the keys in the S3 Path
-        :param s3_path: S3 Path from where you wish to delete all the sub-keys
-        :return: bool
-        """
-        try:
-            for key in self.src_s3.list_objects(Bucket=self.src_bucket_name, Prefix=s3_path)['Contents']:
-                key.delete()
-            logging.warning("""
-                Deleted directory
-                (BUCKET) -> {self.src_bucket_name} : {s3_path}
-            """.format(self=self, s3_path=s3_path))
-            return True
-        except ClientError as e:
-            logging.error(e)
-            return False
-
     def delete_from_s3(self, s3_path, file_name="") -> bool:
         """
         Delete Keys from S3 Bucket under the s3_path
@@ -229,10 +211,7 @@ class S3Utility:
         :return:
         """
         try:
-            bucket_object = Bucket(self.src_s3, self.src_bucket_name)
-            bkt_key = Key(bucket_object)
-            bkt_key.key = s3_path + file_name
-            bucket_object.delete_key(bkt_key)
+            self.src_s3.delete_object(Bucket=self.src_bucket_name, Key=(s3_path + file_name))
             logging.warning("""
                 Deleted directory
                 (BUCKET) -> {self.src_bucket_name} : {s3_path}
