@@ -1,16 +1,29 @@
-# ------------------------------------------------------------------------
 # Module Name :-   AWS S3 Utility
-# Module description : - AWS S3 Functions
-# Parameters required :-
+# Module description : - AWS S3 Functions using BOTO3
 # Created by :- Jatin Chauhan (jatin.chauhan@zs.com)
 # Created on :- 21th Jan, 2019
 # Version History :- v0.6
-# ------------------------------------------------------------------------
+
+# ##################### AWS BOTO3 License ###############################
+
+# Copyright 2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License"). You
+# may not use this file except in compliance with the License. A copy of
+# the License is located at
+#
+# http://aws.amazon.com/apache2.0/
+#
+# or in the "license" file accompanying this file. This file is
+# distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+# ANY KIND, either express or implied. See the License for the specific
+# language governing permissions and limitations under the License.
+# ##################### AWS BOTO3 License ###############################
 
 import logging
 import boto3
 from botocore.exceptions import ClientError
-from boto.s3.connection import S3Connection, Bucket, Key
+from boto.s3.connection import Bucket, Key
 
 
 class S3Utility:
@@ -21,7 +34,17 @@ class S3Utility:
                  dst_bucket_name: str = False,
                  dst_access_key_id: str = False,
                  dst_secret_key_id: str = False):
+        """
+        S3 Utility build using AWS's BOTO3 Library for easy python
+        integration which uses AWS S3 Storage class
 
+        :param src_bucket_name: Source S3 Configuration Parameter: S3 Bucket Name
+        :param src_access_key_id: Source S3 Configuration Parameter: S3 Access Key
+        :param src_secret_key_id: Source S3 Configuration Parameter: S3 Secret Key
+        :param dst_bucket_name: Destination S3 Configuration Parameter: S3 Bucket Name
+        :param dst_access_key_id: Destination S3 Configuration Parameter: S3 Access Key
+        :param dst_secret_key_id: Destination S3 Configuration Parameter: S3 Secret Key
+        """
         logging.warning("S3 Utility")
         self.src_bucket_name = src_bucket_name
         self.src_access_key_id = src_access_key_id
