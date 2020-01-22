@@ -138,7 +138,14 @@ class S3Utility:
             logging.error(e)
             return False
 
-    def copy_s3_to_local(self, s3_path, local_path_to_file, file_name):
+    def copy_s3_to_local(self, s3_path, file_name, local_path_to_file):
+        """
+        opy contents of S3 to Local File System Path
+        :param s3_path: S3 path from where you wish to copy your file. This should be exclusive of the file name
+        :param file_name: File name that you wish to copy
+        :param local_path_to_file: Fully Qualified path to the local file where you wish to copy your S3 Contents
+        :return:
+        """
         try:
             self.src_s3.download_file(self.src_bucket_name, (s3_path + file_name), (local_path_to_file + file_name))
             logging.warning("""
