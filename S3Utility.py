@@ -197,3 +197,24 @@ class S3Utility:
         except ClientError as e:
             logging.error(e)
             return False
+
+    def delete_from_s3(self, s3_path, file_name="") -> bool:
+        """
+        Delete Keys from S3 Bucket under the s3_path
+        :param s3_path: S3 Path from where you want to delete all the sub-keys
+        :param file_name: File name that you want to delete
+        :return:
+        """
+        try:
+            bucket_object = Bucket(self.src_s3, self.src_bucket_name)
+            bkt_key = Key(bucket_object)
+            bkt_key.key = s3_path + file_name
+            bucket_object.delete_key(bkt_key)
+            logging.warning("""
+                Deleted directory
+                (BUCKET) -> {self.src_bucket_name} : {s3_path}
+            """.format(self=self, s3_path=s3_path))
+            return True
+        except ClientError as e:
+            logging.error(e)
+            return False
