@@ -23,7 +23,6 @@
 import logging
 import boto3
 from botocore.exceptions import ClientError
-from boto.s3.connection import Bucket, Key
 
 
 class S3Utility:
@@ -31,9 +30,9 @@ class S3Utility:
                  src_bucket_name: str,
                  src_access_key_id: str,
                  src_secret_key_id: str,
-                 dst_bucket_name: str = False,
-                 dst_access_key_id: str = False,
-                 dst_secret_key_id: str = False):
+                 dst_bucket_name: str = None,
+                 dst_access_key_id: str = None,
+                 dst_secret_key_id: str = None):
         """
         S3 Utility build using AWS's BOTO3 Library for easy python
         integration which uses AWS S3 Storage class
@@ -51,14 +50,18 @@ class S3Utility:
         self.src_secret_key_id = src_secret_key_id
         self.src_s3 = boto3.client('s3', aws_access_key_id=src_access_key_id,
                                    aws_secret_access_key=src_secret_key_id)
-        if dst_bucket_name and dst_access_key_id and dst_secret_key_id:
+        if dst_bucket_name is not None \
+                and dst_access_key_id is not None and dst_secret_key_id is not None:
             self.dst_bucket_name = dst_bucket_name
             self.dst_access_key_id = dst_access_key_id
             self.dst_secret_key_id = dst_secret_key_id
             self.dst_s3 = boto3.client('s3', aws_access_key_id=dst_access_key_id,
                                        aws_secret_access_key=dst_secret_key_id)
         else:
-            logging.warning("S3: Second S3 Bucket is not Configured!")
+            logging.warning("""S3: Second S3 Bucket is not Configured! \n\t 
+                                Required if you are using copy_s3_to_s3 function""")
+
+        logging.warning("S3: Successfully Configured S3 Object")
 
     @staticmethod
     def copy_validator(src_s3, src_bucket_name: str, source_path: str,
@@ -106,7 +109,8 @@ class S3Utility:
         :param destination_path: Destination Path of the S3 Bucket 2
         :return: bool
         """
-        if self.dst_bucket_name and self.dst_access_key_id and self.dst_secret_key_id:
+        if self.dst_bucket_name is None \
+                and self.dst_access_key_id is None and self.dst_secret_key_id is None:
             raise ValueError("""
                 Destination S3 Object is not configured is not Configured
                 Please use help(S3Utility) for more details
