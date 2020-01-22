@@ -126,6 +126,28 @@ class S3Utility:
             self.src_s3.upload_file(local_path_to_file,
                                     self.src_bucket_name,
                                     s3_path)
+            logging.warning("""
+                Copied
+                from
+                LOCAL PATH: {local_path_to_file}
+                to
+                (BUCKET) -> {self.src_bucket_name} : {s3_path}
+            """.format(self=self, s3_path=s3_path, local_path_to_file=local_path_to_file))
+            return True
+        except ClientError as e:
+            logging.error(e)
+            return False
+
+    def copy_s3_to_local(self, s3_path, local_path_to_file, file_name):
+        try:
+            self.src_s3.download_file(self.src_bucket_name, (s3_path + file_name), (local_path_to_file + file_name))
+            logging.warning("""
+                Copied {file_name}
+                from
+                (BUCKET) -> {self.src_bucket_name} : {s3_path}
+                to
+                LOCAL PATH: {local_path_to_file}
+            """.format(self=self, s3_path=s3_path, local_path_to_file=local_path_to_file, file_name=file_name))
             return True
         except ClientError as e:
             logging.error(e)
@@ -142,6 +164,10 @@ class S3Utility:
             for key in self.src_s3.list_objects(Bucket=self.src_bucket_name, Prefix=s3_path)['Contents']:
                 object_list.append(key['Key'])
             object_list.pop(0)
+            logging.warning("""
+                List of Keys
+                (BUCKET) -> {self.src_bucket_name} : {s3_path}
+            """.format(self=self, s3_path=s3_path))
             return object_list
         except ClientError as e:
             logging.error(e)
@@ -154,10 +180,12 @@ class S3Utility:
         :return: bool
         """
         try:
-            logging.warning("S3: Deleting (BUCKET) -> {self.src_bucket_name} : {s3_path}".format(self=self,
-                                                                                                 s3_path=s3_path))
             for key in self.src_s3.list_objects(Bucket=self.src_bucket_name, Prefix=s3_path)['Contents']:
                 key.delete()
+            logging.warning("""
+                Deleted directory
+                (BUCKET) -> {self.src_bucket_name} : {s3_path}
+            """.format(self=self, s3_path=s3_path))
             return True
         except ClientError as e:
             logging.error(e)
