@@ -22,6 +22,7 @@ class S3Utility:
                  dst_access_key_id: str = False,
                  dst_secret_key_id: str = False):
 
+        logging.warning("S3 Utility")
         self.src_bucket_name = src_bucket_name
         self.src_access_key_id = src_access_key_id
         self.src_secret_key_id = src_secret_key_id
@@ -33,6 +34,8 @@ class S3Utility:
             self.dst_secret_key_id = dst_secret_key_id
             self.dst_s3 = boto3.client('s3', aws_access_key_id=dst_access_key_id,
                                        aws_secret_access_key=dst_secret_key_id)
+        else:
+            logging.warning("S3: Second S3 Bucket is not Configured!")
 
     @staticmethod
     def copy_validator(src_s3, src_bucket_name: str, source_path: str,
@@ -45,7 +48,7 @@ class S3Utility:
         :param dst_s3: Destination S3 Connection Object
         :param dst_bucket_name: Destination Bucket Name
         :param destination_path: Destination Path Name
-        :return: Boolean
+        :return: bool
         """
         try:
             for key in src_s3.list_objects(Bucket=src_bucket_name, Prefix=source_path)['Contents']:
@@ -62,7 +65,7 @@ class S3Utility:
             return False
         return True
 
-    def copy_s3_to_s3(self, source_path: str, destination_path: str) -> None:
+    def copy_s3_to_s3(self, source_path: str, destination_path: str) -> bool:
         """
         Copy contents of one S3 bucket to another S3 Bucket
 
@@ -78,7 +81,7 @@ class S3Utility:
 
         :param source_path: Source Path of the S3 Bucket 1
         :param destination_path: Destination Path of the S3 Bucket 2
-        :return: None
+        :return: bool
         """
         if self.dst_bucket_name and self.dst_access_key_id and self.dst_secret_key_id:
             raise ValueError("""
@@ -103,10 +106,43 @@ class S3Utility:
                     self.src_s3.delete_object(Bucket=self.src_bucket_name, Key=source_path)
                     self.dst_s3.delete_object(Bucket=self.dst_bucket_name, Key=destination_path)
                     logging.warning('S3: Objects are successfully copied!')
+                    return True
                 else:
                     self.src_s3.delete_object(Bucket=self.src_bucket_name, Key=source_path)
                     logging.warning('S3: There was an error with the above mentioned path')
-
+                    return False
+            return False
         except ClientError as e:
             logging.error(e)
 
+    def copy_local_to_s3(self, local_path_to_file: str, s3_path: str) -> bool:
+        """
+        Copy contents of Local File System to S3 Path
+        :param local_path_to_file: Fully Qualified path to the local file which you wish to move to S3
+        :param s3_path: S3 path where you wish to move your file
+        :return:
+        """
+        try:
+            self.src_s3.upload_file(local_path_to_file,
+                                    self.src_bucket_name,
+                                    s3_path)
+            return True
+        except ClientError as e:
+            logging.error(e)
+            return False
+
+    def list_objects_in_s3(self, s3_path: str) -> list:
+        """
+        Retrieves list of Objects in the S3 Path specified
+        :param s3_path: S3 Path from where you wish to retrieve the list of objects
+        :return: list
+        """
+        object_list = []
+        try:
+            for key in self.src_s3.list_objects(Bucket=self.src_bucket_name, Prefix=s3_path)['Contents']:
+                object_list.append(key['Key'])
+            object_list.pop(0)
+            return object_list
+        except ClientError as e:
+            logging.error(e)
+            return object_list
