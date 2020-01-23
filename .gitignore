@@ -1,2 +1,4 @@
 .idea
 .idea/*
+__pycache__/*
+__pycache__/S3Utility.cpython-37.pyc

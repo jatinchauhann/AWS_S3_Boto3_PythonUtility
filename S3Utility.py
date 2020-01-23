@@ -169,9 +169,9 @@ class S3Utility:
             logging.error(e)
             return False
 
-    def copy_s3_to_local(self, s3_path, file_name, local_path_to_file):
+    def copy_s3_to_local(self, s3_path: str, file_name: str, local_path_to_file: str) -> bool:
         """
-        opy contents of S3 to Local File System Path
+        Copy contents of S3 to Local File System Path
         :param s3_path: S3 path from where you wish to copy your file. This should be exclusive of the file name
         :param file_name: File name that you wish to copy
         :param local_path_to_file: Fully Qualified path to the local file where you wish to copy your S3 Contents
@@ -211,7 +211,7 @@ class S3Utility:
             logging.error(e)
             return object_list
 
-    def delete_from_s3(self, s3_path, file_name="") -> bool:
+    def delete_from_s3(self, s3_path: str, file_name="") -> bool:
         """
         Delete Keys from S3 Bucket under the s3_path
         :param s3_path: S3 Path from where you want to delete all the sub-keys
