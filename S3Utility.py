@@ -228,3 +228,20 @@ class S3Utility:
         except ClientError as e:
             logging.error(e)
             return False
+
+    def check_if_key_exists_in_s3(self, key: str) -> bool:
+        """
+        Check whether a key is present in the S3 Path
+        :param key: Key to the S3 Bucket
+        :return: bool
+        """
+        try:
+            self.src_s3.head_object(Bucket=self.src_bucket_name, Key=key)
+            logging.warning("""
+                The {key} is present in the 
+                (BUCKET) -> {self.src_bucket_name}
+            """.format(self=self, key=key))
+        except ClientError as e:
+            logging.error(e)
+            return False
+        return True
