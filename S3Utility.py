@@ -105,6 +105,10 @@ class S3Utility:
                                     dst_access_key_id: str,
                                     dst_secret_key_id: str)
 
+        WARNING: If you specify fully qualified path in the <source_path> of individual files, they will be MOVED and
+                not copied. If you specify <source_path> till the folder name, all of the files in that folder will
+                be recurrently copied!
+
         :param source_path: Source Path of the S3 Bucket 1
         :param destination_path: Destination Path of the S3 Bucket 2
         :return: bool
