@@ -5,7 +5,8 @@
 # Version History :- v0.6
 
 # ##################### AWS BOTO3 License ###############################
-
+import boto3
+from botocore.exceptions import ClientError
 # Copyright 2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You
@@ -21,8 +22,6 @@
 # ##################### AWS BOTO3 License ###############################
 
 import logging
-import boto3
-from botocore.exceptions import ClientError
 
 
 class S3Utility:
