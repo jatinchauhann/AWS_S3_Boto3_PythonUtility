@@ -146,7 +146,7 @@ class S3Utility:
         except ClientError as e:
             logging.error(e)
 
-    def copy_local_to_s3(self, local_path_to_file: str, s3_path: str) -> bool:
+    def copy_local_to_s3(self, local_path_to_file: str, file_name: str, s3_path: str) -> bool:
         """
         Copy contents of Local File System to S3 Path
         :param local_path_to_file: Fully Qualified path to the local file which you wish to move to S3
@@ -156,7 +156,8 @@ class S3Utility:
         try:
             self.src_s3.upload_file(local_path_to_file,
                                     self.src_bucket_name,
-                                    s3_path)
+                                    (s3_path + file_name))
+
             logging.warning("""
                 Copied
                 from
@@ -178,7 +179,9 @@ class S3Utility:
         :return:
         """
         try:
-            self.src_s3.download_file(self.src_bucket_name, (s3_path + file_name), (local_path_to_file + file_name))
+            self.src_s3.download_file(self.src_bucket_name,
+                                      (s3_path + file_name),
+                                      (local_path_to_file + file_name))
             logging.warning("""
                 Copied {file_name}
                 from
