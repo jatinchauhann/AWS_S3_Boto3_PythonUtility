@@ -64,6 +64,24 @@ class S3Utility:
         logging.warning("S3: Successfully Configured S3 Object")
 
     @staticmethod
+    def s3_path_validator(s3_path: str = "") -> str:
+        """
+        Validates whether the S3 path is a valid S3 Key and returns a valid key
+        :param s3_path: S3 Path/Key
+        :return: str
+        """
+        if s3_path is "":
+            logging.warning("""
+                <s3_path> in s3_path_validator is either empty or it not passed properly
+            """)
+            raise ValueError("""
+                <s3_path> in s3_path_validator is either empty or it not passed properly
+            """)
+        s3_path = s3_path if s3_path[0] is not '/' else s3_path[1:]
+        s3_path = s3_path if s3_path[-1] is '/' else str(s3_path + '/')
+        return s3_path
+
+    @staticmethod
     def copy_validator(src_s3, src_bucket_name: str, source_path: str,
                        dst_s3, dst_bucket_name: str, destination_path: str) -> bool:
         """
@@ -113,6 +131,11 @@ class S3Utility:
         :param destination_path: Destination Path of the S3 Bucket 2
         :return: bool
         """
+
+        # Validating whether the S3 Keys are properly generated
+        source_path = self.s3_path_validator(source_path)
+        destination_path = self.s3_path_validator(destination_path)
+
         if self.dst_bucket_name is None \
                 and self.dst_access_key_id is None and self.dst_secret_key_id is None:
             raise ValueError("""
@@ -150,10 +173,13 @@ class S3Utility:
         """
         Copy contents of Local File System to S3 Path
         :param local_path_to_file: Fully Qualified path to the local file which you wish to move to S3
+        :param file_name: File name that you want to copy
         :param s3_path: S3 path where you wish to move your file
         :return:
         """
         try:
+            # Validating whether the S3 Key are properly generated
+            s3_path = self.s3_path_validator(s3_path)
             self.src_s3.upload_file(local_path_to_file,
                                     self.src_bucket_name,
                                     (s3_path + file_name))
@@ -173,12 +199,15 @@ class S3Utility:
     def copy_s3_to_local(self, s3_path: str, file_name: str, local_path_to_file: str) -> bool:
         """
         Copy contents of S3 to Local File System Path
-        :param s3_path: S3 path from where you wish to copy your file. This should be exclusive of the file name
-        :param file_name: File name that you wish to copy
+        :param s3_path: S3 path from where you want to copy your file. This should be exclusive of the file name
+        :param file_name: File name that you want to copy
         :param local_path_to_file: Fully Qualified path to the local file where you wish to copy your S3 Contents
         :return:
         """
         try:
+            # Validating whether the S3 Key are properly generated
+            s3_path = self.s3_path_validator(s3_path)
+
             self.src_s3.download_file(self.src_bucket_name,
                                       (s3_path + file_name),
                                       (local_path_to_file + file_name))
@@ -202,6 +231,9 @@ class S3Utility:
         """
         object_list = []
         try:
+            # Validating whether the S3 Key are properly generated
+            s3_path = self.s3_path_validator(s3_path)
+
             for key in self.src_s3.list_objects(Bucket=self.src_bucket_name, Prefix=s3_path)['Contents']:
                 object_list.append(key['Key'])
             object_list.pop(0)
@@ -222,11 +254,14 @@ class S3Utility:
         :return:
         """
         try:
+            # Validating whether the S3 Key are properly generated
+            s3_path = self.s3_path_validator(s3_path)
+
             self.src_s3.delete_object(Bucket=self.src_bucket_name, Key=(s3_path + file_name))
             logging.warning("""
                 Deleted directory
-                (BUCKET) -> {self.src_bucket_name} : {s3_path}
-            """.format(self=self, s3_path=s3_path))
+                (BUCKET) -> {self.src_bucket_name} : {s3_path} {file_name}
+            """.format(self=self, s3_path=s3_path, file_name=file_name))
             return True
         except ClientError as e:
             logging.error(e)
